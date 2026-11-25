@@ -77,7 +77,7 @@ const dict = {
     how_metro_h: "By metro",
     how_metro_p: "Get off at Oleksiivska and walk to building 48V.",
     how_car_h: "By car",
-    how_car_p: "Your navigator will get you there with these coordinates <span class=\"mono\">50.0471622, 36.2036876</span>.",
+    how_car_p: "Use the directions button to navigate directly to Ritmo de Latina in Google Maps.",
     how_ask_h: "Ask first",
     how_ask_p: "Need the entrance or a specific hall? Call us in advance.",
 
