@@ -296,11 +296,11 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
       ? 0
       : target.getBoundingClientRect().top + window.scrollY - headerH();
 
-    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
-
-    history.replaceState(null, "", hash);
+    // Focus before scrolling so iOS Safari cannot interrupt the animation.
     target.setAttribute("tabindex", "-1");
-    target.focus({ preventScroll: true });
+    try { target.focus({ preventScroll: true }); } catch (err) {}
+    try { history.replaceState(null, "", hash); } catch (err) {}
+    window.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
   });
 })();
 
