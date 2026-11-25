@@ -33,7 +33,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&amp;family=Manrope:wght@400;500;700;800&amp;family=Lora:ital,wght@1,400;1,600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=mobile3">
+<link rel="stylesheet" href="styles.css?v=call5">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -143,9 +143,6 @@
 
       <div class="hero__foot">
         <div>
-          <p class="hero__lead" data-enter="3" data-i18n="hero_lead">
-            Бачата, сальса та сальса Нью-Йорк. Щосуботи, три класи поспіль — з 16:00.
-          </p>
           <dl class="hero__stats" data-enter="3">
             <div>
               <dt data-i18n="stat_day">Коли</dt>
@@ -166,7 +163,7 @@
             <span data-i18n="cta_schedule">Розклад і ціни</span>
             <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 L12 4 M6 4 h6 v6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
           </a>
-          <a class="btn btn--line" href="#contacts" data-phone data-cc="380" data-n1="66" data-n2="494" data-n3="83" data-n4="28">
+          <a class="btn btn--line" id="call-choose" href="#contacts">
             <span data-i18n="cta_call">Подзвонити</span>
           </a>
         </div>
@@ -442,6 +439,15 @@
   </div>
 </div>
 
-<script src="script.js?v=map4"></script>
+<dialog class="call-dialog" id="call-dialog" aria-labelledby="call-title">
+  <h2 id="call-title" class="call-dialog__title" data-i18n="call_choose">Оберіть номер телефону</h2>
+  <div class="call-dialog__options">
+    <a class="call-dialog__number" href="#contacts" data-phone data-cc="380" data-n1="66" data-n2="494" data-n3="83" data-n4="28"><small data-i18n="c_phone_k">Телефон 1</small><span data-phone-label></span></a>
+    <a class="call-dialog__number" href="#contacts" data-phone data-cc="380" data-n1="50" data-n2="285" data-n3="92" data-n4="72"><small data-i18n="c_phone_k2">Телефон 2</small><span data-phone-label></span></a>
+  </div>
+  <button class="btn btn--line call-dialog__close" type="button" data-call-close data-i18n="call_cancel">Скасувати</button>
+</dialog>
+
+<script src="script.js?v=call5"></script>
 </body>
 </html>
