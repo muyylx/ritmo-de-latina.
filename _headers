@@ -1,0 +1,36 @@
+# Ritmo de Latina — HTTP security headers
+# Формат: Netlify / Cloudflare Pages. Файл лежить у корені зібраного сайту.
+#
+# CSP свідомо не містить 'unsafe-inline' і 'unsafe-eval':
+# скрипти й стилі лежать у власних файлах, inline-обробників у розмітці немає.
+# Якщо колись додасте inline-скрипт, він не виконається — використовуйте зовнішній файл
+# або додайте його sha256-хеш у script-src.
+
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://www.google.com; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), display-capture=(), fullscreen=(self)
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
+  X-XSS-Protection: 0
+
+# HTML не кешуємо — щоб оновлення політики та контенту доходило одразу.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Статика зі стабільними іменами — короткий кеш.
+/*.css
+  Cache-Control: public, max-age=3600
+/*.js
+  Cache-Control: public, max-age=3600
+/*.svg
+  Cache-Control: public, max-age=2592000
+
+# Службові файли не мають віддаватися як контент.
+/_headers
+  Content-Type: text/plain; charset=utf-8
+  X-Robots-Tag: noindex
