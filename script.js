@@ -160,7 +160,66 @@ function setTheme(next) {
 }
 
 if (langBtn) langBtn.addEventListener("click", () => setLang(lang === "uk" ? "en" : "uk"));
-if (themeBtn) themeBtn.addEventListener("click", () => setTheme(html.dataset.theme === "dark" ? "light" : "dark"));
+/* Animated theme switch, with a graceful fallback for older Safari. */
+let themeChanging = false;
+let themeTimer = 0;
+function changeTheme() {
+  if (themeChanging) return;
+  const next = html.dataset.theme === "dark" ? "light" : "dark";
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setTheme(next);
+    return;
+  }
+  const rect = themeBtn.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  const radius = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))) + 12;
+  html.style.setProperty("--wave-x", x + "px");
+  html.style.setProperty("--wave-y", y + "px");
+  html.style.setProperty("--wave-radius", radius + "px");
+  function pulse() {
+    clearTimeout(themeTimer);
+    html.classList.remove("theme-pop");
+    void themeBtn.offsetWidth;
+    html.classList.add("theme-pop");
+    themeTimer = setTimeout(() => html.classList.remove("theme-pop", "theme-soft"), 650);
+  }
+  function softSwitch() {
+    html.classList.add("theme-soft");
+    void html.offsetWidth;
+    setTheme(next);
+    pulse();
+    const ring = document.createElement("span");
+    ring.className = "theme-ring";
+    ring.setAttribute("aria-hidden", "true");
+    ring.style.setProperty("--wave-x", x + "px");
+    ring.style.setProperty("--wave-y", y + "px");
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 650);
+  }
+  if (typeof document.startViewTransition !== "function" || document.visibilityState === "hidden") {
+    softSwitch();
+    return;
+  }
+  themeChanging = true;
+  html.classList.remove("theme-soft");
+  html.classList.add("theme-wave");
+  try {
+    const transition = document.startViewTransition(() => setTheme(next));
+    transition.ready.catch(() => {});
+    transition.finished.catch(() => {}).then(() => {
+      html.classList.remove("theme-wave");
+      themeChanging = false;
+      if (html.dataset.theme !== next) softSwitch();
+      else pulse();
+    });
+  } catch (error) {
+    html.classList.remove("theme-wave");
+    themeChanging = false;
+    softSwitch();
+  }
+}
+if (themeBtn) themeBtn.addEventListener("click", changeTheme);
 
 let ticking = false;
 window.addEventListener("scroll", () => {
@@ -361,4 +420,28 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
   dialog.querySelectorAll("a[data-phone]").forEach((link) => {
     link.addEventListener("click", () => dialog.close());
   });
+})();
+
+
+/* Reveal sections as they enter the viewport; never hide content in advance. */
+(function revealOnScroll() {
+  if (!("IntersectionObserver" in window) ||
+      typeof Element.prototype.animate !== "function" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const targets = document.querySelectorAll(".section__head, .about__lead, .about__facts, .slot, .price, .visit__address, .visit__map, .visit__how, .contact, .closing__meta");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      observer.unobserve(el);
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      try {
+        el.animate([
+          { opacity: .76, transform: "translateY(12px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ], { duration: 540, easing: "cubic-bezier(.2,.7,.3,1)", fill: "none" });
+      } catch (err) { /* The element remains visible. */ }
+    });
+  }, { threshold: .12 });
+  targets.forEach((el) => observer.observe(el));
 })();
