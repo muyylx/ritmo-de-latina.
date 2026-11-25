@@ -160,9 +160,8 @@ function setTheme(next) {
 }
 
 if (langBtn) langBtn.addEventListener("click", () => setLang(lang === "uk" ? "en" : "uk"));
-/* Animated theme switch, with a graceful fallback for older Safari. */
+/* A browser-independent circular wash; no View Transition API required. */
 let themeChanging = false;
-let themeTimer = 0;
 function changeTheme() {
   if (themeChanging) return;
   const next = html.dataset.theme === "dark" ? "light" : "dark";
@@ -170,54 +169,39 @@ function changeTheme() {
     setTheme(next);
     return;
   }
+  themeChanging = true;
   const rect = themeBtn.getBoundingClientRect();
   const x = rect.left + rect.width / 2;
   const y = rect.top + rect.height / 2;
-  const radius = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))) + 12;
-  html.style.setProperty("--wave-x", x + "px");
-  html.style.setProperty("--wave-y", y + "px");
-  html.style.setProperty("--wave-radius", radius + "px");
-  function pulse() {
-    clearTimeout(themeTimer);
-    html.classList.remove("theme-pop");
-    void themeBtn.offsetWidth;
-    html.classList.add("theme-pop");
-    themeTimer = setTimeout(() => html.classList.remove("theme-pop", "theme-soft"), 650);
-  }
-  function softSwitch() {
-    html.classList.add("theme-soft");
-    void html.offsetWidth;
+  const radius = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))) + 24;
+  const wash = document.createElement("div");
+  wash.className = "theme-wash";
+  wash.setAttribute("aria-hidden", "true");
+  wash.style.left = x + "px";
+  wash.style.top = y + "px";
+  wash.style.width = wash.style.height = (radius * 2) + "px";
+  wash.style.backgroundColor = next === "dark" ? "#101614" : "#fbf9f5";
+  document.body.appendChild(wash);
+  html.classList.add("theme-pop");
+  let swapped = false;
+  const swap = () => {
+    if (swapped) return;
+    swapped = true;
     setTheme(next);
-    pulse();
-    const ring = document.createElement("span");
-    ring.className = "theme-ring";
-    ring.setAttribute("aria-hidden", "true");
-    ring.style.setProperty("--wave-x", x + "px");
-    ring.style.setProperty("--wave-y", y + "px");
-    document.body.appendChild(ring);
-    setTimeout(() => ring.remove(), 650);
-  }
-  if (typeof document.startViewTransition !== "function" || document.visibilityState === "hidden") {
-    softSwitch();
-    return;
-  }
-  themeChanging = true;
-  html.classList.remove("theme-soft");
-  html.classList.add("theme-wave");
-  try {
-    const transition = document.startViewTransition(() => setTheme(next));
-    transition.ready.catch(() => {});
-    transition.finished.catch(() => {}).then(() => {
-      html.classList.remove("theme-wave");
-      themeChanging = false;
-      if (html.dataset.theme !== next) softSwitch();
-      else pulse();
-    });
-  } catch (error) {
-    html.classList.remove("theme-wave");
+  };
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    swap();
+    wash.remove();
+    html.classList.remove("theme-pop");
     themeChanging = false;
-    softSwitch();
-  }
+  };
+  // Swap once the circle covers the viewport, then reveal the new theme.
+  setTimeout(swap, 660);
+  wash.addEventListener("animationend", finish, { once: true });
+  setTimeout(finish, 1400);
 }
 if (themeBtn) themeBtn.addEventListener("click", changeTheme);
 
@@ -329,7 +313,7 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
     const digits = pick(el);
     if (digits.length < 10) return;
     el.setAttribute("href", "tel:+" + digits);
-    const label = el.querySelector("[data-phone-label]");
+    const label = el.matches("[data-phone-label]") ? el : el.querySelector("[data-phone-label]");
     if (label) label.textContent = format(digits);
   });
 })();
@@ -403,22 +387,40 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
   const trigger = document.getElementById("call-choose");
   const dialog = document.getElementById("call-dialog");
   if (!trigger || !dialog || typeof dialog.showModal !== "function") return;
+  let closing = false;
+  const closeSmoothly = () => {
+    if (!dialog.open || closing) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { dialog.close(); return; }
+    closing = true;
+    dialog.classList.add("is-closing");
+    setTimeout(() => {
+      if (dialog.open) dialog.close();
+      dialog.classList.remove("is-closing");
+      closing = false;
+    }, 340);
+  };
   trigger.setAttribute("aria-haspopup", "dialog");
   trigger.addEventListener("click", (event) => {
     if (dialog.open) { event.preventDefault(); return; }
-    try { dialog.showModal(); event.preventDefault(); }
-    catch (err) { /* The link still leads to contacts. */ }
+    try {
+      dialog.classList.remove("is-closing");
+      dialog.showModal();
+      event.preventDefault();
+    } catch (err) { /* The link still leads to contacts. */ }
   });
-  dialog.querySelector("[data-call-close]").addEventListener("click", () => dialog.close());
+  dialog.querySelector("[data-call-close]").addEventListener("click", closeSmoothly);
+  dialog.addEventListener("cancel", (event) => { event.preventDefault(); closeSmoothly(); });
   dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) {
-      const rect = dialog.getBoundingClientRect();
-      if (event.clientX < rect.left || event.clientX > rect.right ||
-          event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
-    }
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right ||
+        event.clientY < rect.top || event.clientY > rect.bottom) closeSmoothly();
   });
   dialog.querySelectorAll("a[data-phone]").forEach((link) => {
-    link.addEventListener("click", () => dialog.close());
+    link.addEventListener("click", () => {
+      // Let the browser launch the tel: link directly from the user's tap.
+      setTimeout(closeSmoothly, 0);
+    });
   });
 })();
 
@@ -437,9 +439,9 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       try {
         el.animate([
-          { opacity: .76, transform: "translateY(12px)" },
+          { opacity: .50, transform: "translateY(22px)" },
           { opacity: 1, transform: "translateY(0)" }
-        ], { duration: 540, easing: "cubic-bezier(.2,.7,.3,1)", fill: "none" });
+        ], { duration: 850, easing: "cubic-bezier(.2,.7,.3,1)", fill: "none" });
       } catch (err) { /* The element remains visible. */ }
     });
   }, { threshold: .12 });
