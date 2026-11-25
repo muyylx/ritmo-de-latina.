@@ -1165,3 +1165,27 @@ body.has-cookie { padding-bottom: 130px; }
   .hero__wrap { padding: 16px; }
   .hero__title { font-size: 11.4vw; }
 }
+
+/* Call chooser: shared desktop/mobile, native dialog with accessible links. */
+.hero__foot .hero__stats { margin-top: 0; padding-top: 0; border-top: 0; }
+.call-dialog {
+  width: min(420px, calc(100% - 32px)); max-height: calc(100% - 32px);
+  padding: 24px; border: 1px solid var(--line); border-radius: 20px;
+  background: var(--card); color: var(--ink); overflow: auto;
+  box-shadow: 0 20px 70px rgba(0,0,0,.24);
+}
+.call-dialog:not([open]) { display: none; }
+.call-dialog::backdrop { background: rgba(10,20,18,.55); }
+.call-dialog__title { margin: 0 0 18px; font-family: var(--f-display); font-size: 1.15rem; line-height: 1.35; }
+.call-dialog__options { display: grid; gap: 10px; }
+.call-dialog__number {
+  display: grid; gap: 2px; min-height: 56px; padding: 12px 15px;
+  border: 1px solid var(--line); border-radius: 12px; color: var(--brand); background: var(--bg);
+  font-weight: 800; font-size: 1rem; text-decoration: none;
+}
+.call-dialog__number:hover { border-color: var(--brand); }
+.call-dialog__number small { font-size: .72rem; font-weight: 600; color: var(--ink-2); }
+.call-dialog__close { width: 100%; justify-content: center; min-height: 48px; margin-top: 16px; }
+@media (max-width: 639px) {
+  .call-dialog { margin: auto auto max(12px, env(safe-area-inset-bottom, 0px)); padding: 20px; }
+}
