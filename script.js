@@ -338,9 +338,17 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
     e.preventDefault();
 
+    const mobile = window.matchMedia("(max-width: 899px), (hover: none) and (pointer: coarse) and (max-width: 1100px)").matches;
+    // Align the section content (not its outer border) just below the sticky header.
+    // Use the stable section box rather than its animated heading.
+    const header = document.querySelector(".nav");
+    const sectionPadding = parseFloat(getComputedStyle(target).paddingTop) || 0;
+    const offset = mobile && target.matches("section.section")
+      ? (header?.getBoundingClientRect().height ?? 64) + 10 - sectionPadding
+      : headerH();
     const top = hash === "#top"
       ? 0
-      : target.getBoundingClientRect().top + window.scrollY - headerH();
+      : target.getBoundingClientRect().top + window.scrollY - offset;
 
     // Focus before scrolling so iOS Safari cannot interrupt the animation.
     target.setAttribute("tabindex", "-1");
