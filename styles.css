@@ -1189,3 +1189,86 @@ body.has-cookie { padding-bottom: 130px; }
 @media (max-width: 639px) {
   .call-dialog { margin: auto auto max(12px, env(safe-area-inset-bottom, 0px)); padding: 20px; }
 }
+
+/* Motion refinement: theme wave and scroll entrances. */
+:root { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+#theme .chip__dot { transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Content remains readable, even if an animation is interrupted. */
+  [data-enter], .hero__word, .hero [data-enter] {
+    opacity: 1; transform: none; animation: none;
+  }
+  .hero__meta { animation: gentle-rise .55s var(--ease) both; }
+  .hero__title .hero__word { animation: gentle-rise .72s var(--ease) both; }
+  .hero__title .hero__word:nth-child(2) { animation-delay: .065s; }
+  .hero__title .hero__word:nth-child(3) { animation-delay: .13s; }
+  .hero__foot { animation: gentle-rise .72s .12s var(--ease) both; }
+  .hero__micro { animation: gentle-rise .65s .19s var(--ease) both; }
+  .nav__links a {
+    transition: color .25s var(--ease), background-color .3s var(--ease);
+  }
+  .nav__icon { transition: transform .32s var(--ease); }
+  .nav__links a.is-active .nav__icon { transform: translateY(-2px); }
+  .btn, .chip, .contact, .price, .call-dialog__number {
+    transition: transform .24s var(--ease), background-color .3s var(--ease),
+      color .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .btn:active, .chip:active, .contact:active, .call-dialog__number:active {
+    transform: scale(.975);
+  }
+  .call-dialog[open] { animation: dialog-arrive .32s var(--ease) both; }
+  .call-dialog[open]::backdrop { animation: backdrop-arrive .24s ease both; }
+  /* Fallback for browsers without same-document View Transitions. */
+  .theme-soft body, .theme-soft .nav, .theme-soft .nav__links,
+  .theme-soft .hero__wrap, .theme-soft .section, .theme-soft .about__facts,
+  .theme-soft .slot, .theme-soft .price, .theme-soft .contact,
+  .theme-soft .visit__address, .theme-soft .visit__map, .theme-soft .closing,
+  .theme-soft .cookie, .theme-soft .call-dialog, .theme-soft .call-dialog__number,
+  .theme-soft .btn, .theme-soft .chip {
+    transition: background-color .44s ease, color .44s ease,
+      border-color .44s ease, box-shadow .44s ease, transform .22s var(--ease);
+  }
+  .theme-soft .label, .theme-soft .serif, .theme-soft .hero__word--serif,
+  .theme-soft .hero__meta, .theme-soft .hero__micro, .theme-soft .slot__time,
+  .theme-soft .about__lead p, .theme-soft .price__desc, .theme-soft .contact__hint {
+    transition: color .44s ease;
+  }
+  .theme-pop #theme .chip__dot { animation: theme-icon-turn .55s var(--ease); }
+  .theme-ring {
+    position: fixed; z-index: 100; pointer-events: none; width: 44px; height: 44px;
+    left: var(--wave-x); top: var(--wave-y); border: 2px solid var(--accent);
+    border-radius: 50%; transform: translate(-50%, -50%);
+    animation: theme-ring-out .52s var(--ease) both;
+  }
+  /* Native transition: the new theme expands from the theme button. */
+  html.theme-wave::view-transition-group(root) { animation-duration: .58s; }
+  html.theme-wave::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+  html.theme-wave::view-transition-new(root) {
+    animation: theme-circle .58s cubic-bezier(.25,.75,.25,1) both;
+    mix-blend-mode: normal;
+  }
+  html.theme-wave::view-transition-image-pair(root) { isolation: isolate; }
+}
+@keyframes gentle-rise {
+  from { opacity: .78; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dialog-arrive {
+  from { opacity: .7; transform: translateY(14px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes backdrop-arrive { from { opacity: 0; } to { opacity: 1; } }
+@keyframes theme-icon-turn {
+  0% { transform: rotate(-60deg) scale(.75); }
+  65% { transform: rotate(18deg) scale(1.18); }
+  100% { transform: rotate(0) scale(1); }
+}
+@keyframes theme-ring-out {
+  from { opacity: .65; transform: translate(-50%, -50%) scale(.8); }
+  to { opacity: 0; transform: translate(-50%, -50%) scale(3.4); }
+}
+@keyframes theme-circle {
+  from { clip-path: circle(0px at var(--wave-x) var(--wave-y)); }
+  to { clip-path: circle(var(--wave-radius) at var(--wave-x) var(--wave-y)); }
+}
