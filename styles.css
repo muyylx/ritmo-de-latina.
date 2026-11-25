@@ -1199,12 +1199,12 @@ body.has-cookie { padding-bottom: 130px; }
   [data-enter], .hero__word, .hero [data-enter] {
     opacity: 1; transform: none; animation: none;
   }
-  .hero__meta { animation: gentle-rise .55s var(--ease) both; }
+  .hero .hero__meta { animation: gentle-rise .55s var(--ease) both; }
   .hero__title .hero__word { animation: gentle-rise .72s var(--ease) both; }
   .hero__title .hero__word:nth-child(2) { animation-delay: .065s; }
   .hero__title .hero__word:nth-child(3) { animation-delay: .13s; }
-  .hero__foot { animation: gentle-rise .72s .12s var(--ease) both; }
-  .hero__micro { animation: gentle-rise .65s .19s var(--ease) both; }
+  .hero .hero__foot { animation: gentle-rise .72s .12s var(--ease) both; }
+  .hero .hero__micro { animation: gentle-rise .65s .19s var(--ease) both; }
   .nav__links a {
     transition: color .25s var(--ease), background-color .3s var(--ease);
   }
