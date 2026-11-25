@@ -1272,3 +1272,45 @@ body.has-cookie { padding-bottom: 130px; }
   from { clip-path: circle(0px at var(--wave-x) var(--wave-y)); }
   to { clip-path: circle(var(--wave-radius) at var(--wave-x) var(--wave-y)); }
 }
+
+/* Motion 9: consistent, visible motion in Chrome and Safari. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero .hero__meta { animation-duration: .85s; }
+  .hero__title .hero__word { animation-duration: 1.05s; }
+  .hero__title .hero__word:nth-child(2) { animation-delay: .12s; }
+  .hero__title .hero__word:nth-child(3) { animation-delay: .24s; }
+  .hero .hero__foot { animation-duration: 1s; animation-delay: .23s; }
+  .hero .hero__micro { animation-duration: .95s; animation-delay: .32s; }
+  .theme-wash {
+    position: fixed; z-index: 1000; pointer-events: none;
+    border-radius: 50%; transform-origin: center;
+    transform: translate(-50%, -50%) scale(0);
+    animation: theme-wash-expand 1.24s both;
+    will-change: transform, opacity;
+  }
+  .call-dialog[open] { animation: call-sheet-open .65s cubic-bezier(.18,.75,.24,1) both; }
+  .call-dialog[open]::backdrop { animation: backdrop-arrive .55s ease both; }
+  .call-dialog[open] .call-dialog__number { animation: call-option-in .53s .12s var(--ease) both; }
+  .call-dialog[open] .call-dialog__number:nth-child(2) { animation-delay: .23s; }
+  .call-dialog[open] .call-dialog__close { animation: call-option-in .48s .30s var(--ease) both; }
+  .call-dialog[open].is-closing { animation: call-sheet-close .32s ease-in both; }
+  .call-dialog[open].is-closing::backdrop { animation: backdrop-arrive .32s ease reverse both; }
+  .call-dialog[open].is-closing .call-dialog__number,
+  .call-dialog[open].is-closing .call-dialog__close { animation: none; }
+  @media (max-width: 639px) {
+    .call-dialog[open] { animation-name: call-mobile-open; }
+    .call-dialog[open].is-closing { animation-name: call-mobile-close; }
+  }
+}
+@keyframes theme-wash-expand {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 1; animation-timing-function: cubic-bezier(.42,0,.25,1); }
+  53.3% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+@keyframes call-sheet-open { from { opacity: 0; transform: translateY(28px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes call-sheet-close { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(22px) scale(.97); } }
+@keyframes call-mobile-open { from { opacity: .35; transform: translateY(105%); } to { opacity: 1; transform: translateY(0); } }
+@keyframes call-mobile-close { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(105%); } }
+@keyframes call-option-in { from { opacity: .25; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .theme-wash { display: none; } }
+.closing__col a[data-phone] { display: inline-block; min-height: 30px; line-height: 1.5; font-variant-numeric: tabular-nums; }
