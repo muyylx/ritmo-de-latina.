@@ -30,6 +30,8 @@ const dict = {
     cur: "UAH",
     cta_schedule: "Schedule and prices",
     cta_call: "Call us",
+    call_choose: "Choose a phone number",
+    call_cancel: "Cancel",
     hero_scroll: "Scroll",
 
     schedule_label: "Schedule",
@@ -333,4 +335,29 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
   }, { rootMargin: "-45% 0px -45% 0px", threshold: [0, .25, .5, 1] });
 
   map.forEach((_, sec) => io.observe(sec));
+})();
+
+
+/* ---------- phone number chooser ---------- */
+(function phoneChooser() {
+  const trigger = document.getElementById("call-choose");
+  const dialog = document.getElementById("call-dialog");
+  if (!trigger || !dialog || typeof dialog.showModal !== "function") return;
+  trigger.setAttribute("aria-haspopup", "dialog");
+  trigger.addEventListener("click", (event) => {
+    if (dialog.open) { event.preventDefault(); return; }
+    try { dialog.showModal(); event.preventDefault(); }
+    catch (err) { /* The link still leads to contacts. */ }
+  });
+  dialog.querySelector("[data-call-close]").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+      const rect = dialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right ||
+          event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+    }
+  });
+  dialog.querySelectorAll("a[data-phone]").forEach((link) => {
+    link.addEventListener("click", () => dialog.close());
+  });
 })();
