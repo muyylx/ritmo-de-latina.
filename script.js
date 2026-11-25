@@ -282,6 +282,7 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
   const headerH = () => (document.querySelector(".nav")?.offsetHeight ?? 64) + 16;
 
   document.addEventListener("click", (e) => {
+    if (e.defaultPrevented) return;
     const a = e.target.closest('a[href^="#"]');
     if (!a) return;
     const hash = a.getAttribute("href");
