@@ -1059,3 +1059,90 @@ body.has-cookie { padding-bottom: 130px; }
     transition-duration: .01ms !important;
   }
 }
+
+
+/* Mobile layout: compact hero and always-available section navigation.
+   The coarse-pointer condition also covers iPhone desktop-site mode. */
+@media (max-width: 899px), (hover: none) and (pointer: coarse) and (max-width: 1100px) {
+  .nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .35rem .65rem;
+    padding: .55rem var(--pad) .3rem;
+    background: var(--bg);
+    border-bottom-color: var(--line);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav__mark { grid-column: 1; grid-row: 1; }
+  .nav__tools { grid-column: 2; grid-row: 1; gap: .35rem; }
+  .nav__tools .chip { min-height: 44px; padding: .45rem .7rem; }
+  .nav__links {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    font-size: .85rem;
+  }
+  .nav__links::-webkit-scrollbar { display: none; }
+  .nav__links a {
+    flex: 0 0 auto;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: .45rem .1rem;
+  }
+  .nav__links a.is-active { font-weight: 800; }
+  html { scroll-padding-top: 112px; }
+  section[id], #top { scroll-margin-top: 0; }
+  .hero {
+    min-height: 0;
+    height: auto;
+    display: block;
+    padding: 1.8rem var(--pad) 1.25rem;
+  }
+  .hero__title {
+    font-size: clamp(1.85rem, 10vw, 4.2rem);
+    line-height: 1.06;
+  }
+  .hero__foot {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    margin-top: 1.4rem;
+  }
+  .hero__stats { gap: .85rem 1.25rem; }
+  .hero__acts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .hero__acts .btn {
+    flex: 1 1 145px;
+    justify-content: center;
+    min-height: 48px;
+    padding: .8rem .9rem;
+    text-align: center;
+  }
+  .hero__rule {
+    margin: 0 auto;
+    padding-top: 1.25rem;
+  }
+  /* Keep essential content visible even if Safari interrupts animations. */
+  .hero [data-enter], .hero__word {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 380px) {
+  .nav__name { font-size: 1rem; }
+  .nav__tools .chip { padding-inline: .5rem; }
+  .nav__links { gap: .7rem; }
+  .hero__acts .btn { flex-basis: 100%; }
+}
